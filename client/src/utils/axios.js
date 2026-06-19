@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://eventora-backend-ilbp.onrender.com',
+    baseURL: 'https://eventora-backend-ilbp.onrender.com/api',
     headers:{
         'Content-Type' : 'application/json'
     },
