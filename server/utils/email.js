@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // Keep this if you are using Gmail
     host: 'smtp.gmail.com',
     port: 587, // Render allows this port!
     secure: false, // Must be false for port 587
