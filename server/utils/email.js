@@ -3,11 +3,17 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const transporter = nodeMailer.createTransport({
-    service: 'gmail',
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Keep this if you are using Gmail
+    host: 'smtp.gmail.com',
+    port: 587, // Render allows this port!
+    secure: false, // Must be false for port 587
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // This stops strict SSL blocks
     }
 });
 
