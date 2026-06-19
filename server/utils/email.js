@@ -3,13 +3,19 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+// 1. Configure the secure transporter
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL/TLS
+    port: 587,
+    secure: false, // Must be false for port 587
+    requireTLS: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    // This forces Node to use IPv4 instead of IPv6, bypassing the ENETUNREACH error!
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
