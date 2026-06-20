@@ -4,27 +4,45 @@ import api from '../utils/axios';
 import { FaCalendarAlt, FaMapMarkerAlt, FaSearch, FaRegClock, FaTicketAlt, FaShieldAlt } from 'react-icons/fa';
 
 const Home = () => {
-    const [events, setEvents] = useState([]);
+    const [allEvents, setAllEvents] = useState([]); // Master list from backend
+    const [filteredEvents, setFilteredEvents] = useState([]); // What the user actually sees
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
 
+    // Fetch all events exactly ONCE when the component mounts
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            fetchEvents();
-        }, 400); // 400ms debounce
-        return () => clearTimeout(timeoutId);
-    }, [search]);
+        fetchEvents();
+    }, []);
 
     const fetchEvents = async () => {
         try {
-            const { data } = await api.get(`/events?search=${search}`);
-            setEvents(data);
+            const { data } = await api.get('/events');
+            setAllEvents(data);
+            setFilteredEvents(data); // Initially show all events
         } catch (error) {
             console.error('Error fetching events:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    // Filter the events locally whenever the search query changes
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (search.trim() === '') {
+                setFilteredEvents(allEvents);
+            } else {
+                const lowerCaseSearch = search.toLowerCase();
+                const results = allEvents.filter(event => 
+                    event.title.toLowerCase().includes(lowerCaseSearch) || 
+                    (event.category && event.category.toLowerCase().includes(lowerCaseSearch))
+                );
+                setFilteredEvents(results);
+            }
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [search, allEvents]);
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -45,7 +63,7 @@ const Home = () => {
                         <FaSearch className="absolute left-6 text-gray-500 text-xl group-focus-within:text-black transition-colors" />
                         <input
                             type="text"
-                            placeholder="Search events by title..."
+                            placeholder="Search events by title or category..."
                             className="w-full pl-16 pr-6 py-5 rounded-full text-lg text-black bg-white/95 backdrop-blur-sm border-2 border-transparent focus:border-gray-500 focus:outline-none transition-all placeholder-gray-400 font-medium"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -81,16 +99,16 @@ const Home = () => {
 
             <div className="flex items-center justify-between mb-8 px-2 border-b border-gray-200 pb-4">
                 <h2 className="text-3xl font-extrabold text-gray-900">Upcoming Events</h2>
-                <div className="text-gray-500 font-medium">{events.length} results found</div>
+                <div className="text-gray-500 font-medium">{filteredEvents.length} results found</div>
             </div>
 
             {loading ? (
                 <div className="text-center py-20 text-xl font-semibold text-gray-600">Loading events...</div>
-            ) : events.length === 0 ? (
+            ) : filteredEvents.length === 0 ? (
                 <div className="text-center py-20 text-xl text-gray-500">No events found matching your search.</div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {events.map(event => (
+                    {filteredEvents.map(event => (
                         <div key={event._id} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition flex flex-col">
                             <div className="h-48 bg-gray-200 overflow-hidden relative">
                                 {event.image ? (
