@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'eventora-h6x8.vercel.app/api',
+    baseURL: 'eventora-h6x8.vercel.app',
     headers:{
         'Content-Type' : 'application/json'
     },
