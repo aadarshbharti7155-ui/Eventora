@@ -14,6 +14,12 @@ app.use(cors({
     origin: '*', 
     credentials: true
 }));
+
+// Simple health check route
+app.get('/', (req, res) => {
+  res.send('Eventora Backend is up and running!');
+});
+
 app.use(express.json());
 
 //Routes
